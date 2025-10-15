@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Pengguna | Smart Recycling</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>🌱 Smart Recycling</h2>
+    <ul>
+      <li><a href="dashboard.html">Beranda</a></li>
+      <li><a href="activity.html">Lacak Aktivitas</a></li>
+      <li><a href="rewards.html">Poin Reward</a></li>
+      <li><a href="profile.html" class="active">Profil</a></li>
+      <li><a href="news.html">Berita</a></li>
+      <li><a href="map.html">Lokasi Bank Sampah</a></li>
+      <li><a href="contact.html">Kontak</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </aside>
+
+  <main class="dashboard-content">
+    <h1>Profil Pengguna 👤</h1>
+
+    <div class="auth-container" style="max-width:500px; margin:auto; text-align:center;">
+      <img id="fotoProfil" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Foto Profil" style="width:120px; border-radius:50%; margin-bottom:15px;">
+      <h2 id="nama">Zhafir Avel</h2>
+      <p><strong>Email:</strong> <span id="email">zhafir@example.com</span></p>
+      <p><strong>Tanggal Bergabung:</strong> <span id="tglGabung">12 Januari 2025</span></p>
+      <p><strong>Status:</strong> <span id="status">Eco Warrior 🌿</span></p>
+
+      <button id="editBtn" style="margin-top:15px;">Edit Profil</button>
+
+      <!-- FORM EDIT PROFIL (TERSEMBUNYI) -->
+      <div id="editForm" style="display:none; margin-top:20px; text-align:left;">
+        <h3>Edit Profil</h3>
+        <label>Nama:</label><br>
+        <input type="text" id="editNama" style="width:100%; margin-bottom:10px;"><br>
+        <label>Email:</label><br>
+        <input type="email" id="editEmail" style="width:100%; margin-bottom:10px;"><br>
+        <label>Status:</label><br>
+        <input type="text" id="editStatus" style="width:100%; margin-bottom:10px;"><br>
+        <button id="saveBtn">Simpan Perubahan</button>
+        <button id="cancelBtn" style="margin-left:10px;">Batal</button>
+      </div>
+
+      <hr style="margin:25px 0;">
+
+      <!-- Statistik Aktivitas -->
+      <h3>Statistik Aktivitas 🌎</h3>
+      <p><strong>Total Sampah Didaur Ulang:</strong> 45 kg</p>
+      <p><strong>Poin Terkumpul:</strong> 850 / 1000</p>
+      <div style="background:#ddd; border-radius:20px; overflow:hidden; margin:10px 0;">
+        <div style="width:85%; background:#4CAF50; color:white; padding:5px 0;">85%</div>
+      </div>
+      <p><em>Hampir mencapai level berikutnya! 💪</em></p>
+
+      <!-- Lencana Pencapaian -->
+      <h3>Lencana Pencapaian 🏅</h3>
+      <div>
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Badge Recycler Pro" style="width:60px; margin:5px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Badge Eco Hero" style="width:60px; margin:5px; opacity:0.5;">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Badge Green Saver" style="width:60px; margin:5px; opacity:0.3;">
+      </div>
+      <p><small><em>*Lencana berikutnya akan terbuka saat poin mencapai 1000 🌟</em></small></p>
+
+      <!-- Tombol Riwayat Aktivitas -->
+      <button onclick="window.location.href='activity.html'" style="margin-top:20px;">Lihat Riwayat Aktivitas</button>
+    </div>
+  </main>
+
+  <script>
+    const editBtn = document.getElementById('editBtn');
+    const editForm = document.getElementById('editForm');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    const namaField = document.getElementById('nama');
+    const emailField = document.getElementById('email');
+    const statusField = document.getElementById('status');
+
+    const editNama = document.getElementById('editNama');
+    const editEmail = document.getElementById('editEmail');
+    const editStatus = document.getElementById('editStatus');
+
+    // Saat klik tombol Edit Profil
+    editBtn.addEventListener('click', () => {
+      editForm.style.display = 'block';
+      editNama.value = namaField.textContent;
+      editEmail.value = emailField.textContent;
+      editStatus.value = statusField.textContent;
+      editBtn.style.display = 'none';
+    });
+
+    // Simpan perubahan
+    saveBtn.addEventListener('click', () => {
+      namaField.textContent = editNama.value;
+      emailField.textContent = editEmail.value;
+      statusField.textContent = editStatus.value;
+
+      alert('✅ Profil berhasil diperbarui!');
+      editForm.style.display = 'none';
+      editBtn.style.display = 'inline-block';
+    });
+
+    // Batal edit
+    cancelBtn.addEventListener('click', () => {
+      editForm.style.display = 'none';
+      editBtn.style.display = 'inline-block';
+    });
+  </script>
+</body>
+</html>

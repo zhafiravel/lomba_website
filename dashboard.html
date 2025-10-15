@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Smart Recycling</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>🌱 Smart Recycling</h2>
+        <ul>
+            <li><a href="dashboard.html" class="active">Beranda</a></li>
+            <li><a href="activity.html">Lacak Aktivitas</a></li>
+            <li><a href="rewards.html">Poin Reward</a></li>
+            <li><a href="profile.html">Profil</a></li>
+            <li><a href="news.html">Berita</a></li>
+            <li><a href="map.html">Lokasi Bank Sampah</a></li>
+            <li><a href="contact.html">Kontak</a></li>
+            <li><a href="index.html">Logout</a></li>
+        </ul>
+    </aside>
+
+    <main class="dashboard-content">
+        <h1>Selamat Datang di Smart Recycling, Zhafir!</h1>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h3>🗑️ 12</h3>
+                <p>Sampah Didaur Ulang</p>
+            </div>
+            <div class="stat-box">
+                <h3>💰 250</h3>
+                <p>Total Poin</p>
+            </div>
+            <div class="stat-box">
+                <h3>🌿 5.2 kg</h3>
+                <p>Dampak Positif</p>
+            </div>
+        </div>
+
+        <!-- Grafik Daur Ulang -->
+        <section>
+            <h2>📊 Statistik Jenis Sampah Daur Ulang</h2>
+            <canvas id="recycleChart" width="400" height="200"></canvas>
+        </section>
+
+        <!-- Progress Level dan Badge -->
+        <section>
+            <h2>🏅 Level Kamu: <span id="levelName">Green Hero</span></h2>
+            <p>Progres menuju level berikutnya:</p>
+            <progress id="levelProgress" value="250" max="500" style="width: 100%; height: 20px;"></progress>
+            <p><small><span id="remainingPoints">250 poin lagi</span> untuk mencapai level selanjutnya!</small></p>
+        </section>
+
+        <!-- Pesan Dampak Positif -->
+        <section id="ecoMessage" style="margin-top: 30px; background: #e8f5e9; padding: 15px; border-radius: 8px;">
+            <strong>💬 Dampak Positif:</strong>
+            <p id="impactText">Kamu telah menyelamatkan setara 2 pohon dari penebangan! 🌳</p>
+        </section>
+    </main>
+
+    <script>
+        // --- Chart.js: Grafik Jenis Sampah ---
+        const ctx = document.getElementById('recycleChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Plastik', 'Kertas', 'Logam', 'Organik', 'Kaca'],
+                datasets: [{
+                    label: 'Kg Daur Ulang',
+                    data: [2.3, 1.5, 0.8, 0.4, 0.2],
+                    backgroundColor: ['#66bb6a', '#81c784', '#a5d6a7', '#c8e6c9', '#e8f5e9']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Kilogram (Kg)' }
+                    }
+                }
+            }
+        });
+
+        // --- Sistem Level dan Badge ---
+        const currentPoints = 250;
+        const maxPoints = 500;
+        const levelName = document.getElementById('levelName');
+        const remainingPoints = document.getElementById('remainingPoints');
+        const progressBar = document.getElementById('levelProgress');
+
+        progressBar.value = currentPoints;
+        remainingPoints.textContent = (maxPoints - currentPoints) + " poin lagi";
+
+        if (currentPoints < 100) {
+            levelName.textContent = "Eco Starter";
+        } else if (currentPoints < 300) {
+            levelName.textContent = "Green Hero";
+        } else {
+            levelName.textContent = "Recycling Champion";
+        }
+
+        // --- Pesan Dampak Positif Dinamis ---
+        const totalRecycle = 12; // dari stat-box
+        const impactText = document.getElementById('impactText');
+
+        if (totalRecycle < 5) {
+            impactText.textContent = "Awal yang bagus! Terus semangat untuk mulai kebiasaan hijau! 🌱";
+        } else if (totalRecycle < 10) {
+            impactText.textContent = "Keren! Kamu sudah membantu menjaga kebersihan lingkungan! 🌿";
+        } else {
+            impactText.textContent = "Luar biasa! Kamu sudah menyelamatkan setara 2 pohon dari penebangan! 🌳";
+        }
+    </script>
+</body>
+</html>

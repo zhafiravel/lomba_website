@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aktivitas | Smart Recycling</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>🌱 Smart Recycling</h2>
+    <ul>
+      <li><a href="dashboard.html">Beranda</a></li>
+      <li><a href="activity.html" class="active">Lacak Aktivitas</a></li>
+      <li><a href="rewards.html">Poin Reward</a></li>
+      <li><a href="profile.html">Profil</a></li>
+      <li><a href="news.html">Berita</a></li>
+      <li><a href="map.html">Lokasi Bank Sampah</a></li>
+      <li><a href="contact.html">Kontak</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </aside>
+
+  <main class="dashboard-content activity-page">
+    <h1>Riwayat Aktivitas ♻️</h1>
+
+    <!-- 🔍 Filter Section -->
+    <div class="filter-section">
+      <label for="jenis">Filter Jenis Sampah:</label>
+      <select id="jenis">
+        <option value="semua">Semua</option>
+        <option value="Plastik">Plastik</option>
+        <option value="Kertas">Kertas</option>
+        <option value="Logam">Logam</option>
+        <option value="Kaca">Kaca</option>
+      </select>
+
+      <label for="tanggalAwal">Dari:</label>
+      <input type="date" id="tanggalAwal">
+
+      <label for="tanggalAkhir">Sampai:</label>
+      <input type="date" id="tanggalAkhir">
+
+      <button id="filterBtn">Terapkan Filter</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+    <!-- 📋 Tabel Aktivitas -->
+    <table id="activityTable">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Jenis Sampah</th>
+          <th>Berat (kg)</th>
+          <th>Poin Didapat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-10-10</td>
+          <td>Plastik</td>
+          <td>2.5</td>
+          <td>25</td>
+        </tr>
+        <tr>
+          <td>2025-10-05</td>
+          <td>Kertas</td>
+          <td>1.2</td>
+          <td>15</td>
+        </tr>
+        <tr>
+          <td>2025-09-28</td>
+          <td>Logam</td>
+          <td>3.0</td>
+          <td>30</td>
+        </tr>
+        <tr>
+          <td>2025-09-20</td>
+          <td>Kaca</td>
+          <td>1.8</td>
+          <td>20</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 🧮 Total -->
+    <div id="totalInfo" style="margin-top: 15px; font-weight: bold;">
+      Total Berat: 8.5 kg | Total Poin: 90
+    </div>
+  </main>
+
+  <!-- ⚙️ Script untuk interaktivitas -->
+  <script>
+    const filterBtn = document.getElementById('filterBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const jenisSelect = document.getElementById('jenis');
+    const tAwal = document.getElementById('tanggalAwal');
+    const tAkhir = document.getElementById('tanggalAkhir');
+    const table = document.getElementById('activityTable').getElementsByTagName('tbody')[0];
+    const totalInfo = document.getElementById('totalInfo');
+
+    const allData = Array.from(table.rows).map(row => ({
+      tanggal: row.cells[0].innerText,
+      jenis: row.cells[1].innerText,
+      berat: parseFloat(row.cells[2].innerText),
+      poin: parseInt(row.cells[3].innerText)
+    }));
+
+    function renderTable(data) {
+      table.innerHTML = '';
+      let totalBerat = 0;
+      let totalPoin = 0;
+
+      data.forEach(item => {
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+          <td>${item.tanggal}</td>
+          <td>${item.jenis}</td>
+          <td>${item.berat}</td>
+          <td>${item.poin}</td>
+        `;
+        totalBerat += item.berat;
+        totalPoin += item.poin;
+      });
+
+      totalInfo.innerText = `Total Berat: ${totalBerat.toFixed(1)} kg | Total Poin: ${totalPoin}`;
+    }
+
+    filterBtn.addEventListener('click', () => {
+      const jenis = jenisSelect.value;
+      const awal = tAwal.value ? new Date(tAwal.value) : null;
+      const akhir = tAkhir.value ? new Date(tAkhir.value) : null;
+
+      const filtered = allData.filter(item => {
+        const t = new Date(item.tanggal);
+        const matchJenis = jenis === 'semua' || item.jenis === jenis;
+        const matchTanggal = (!awal || t >= awal) && (!akhir || t <= akhir);
+        return matchJenis && matchTanggal;
+      });
+
+      renderTable(filtered);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      jenisSelect.value = 'semua';
+      tAwal.value = '';
+      tAkhir.value = '';
+      renderTable(allData);
+    });
+
+    // Inisialisasi awal
+    renderTable(allData);
+  </script>
+</body>
+</html>

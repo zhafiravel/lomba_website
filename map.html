@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peta Lokasi | Smart Recycling</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Geocoder (Search Bar) CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+  <style>
+    #map {
+      width: 100%;
+      height: 500px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f9f4;
+      display: flex;
+    }
+
+    .dashboard-content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .dashboard-content h1 {
+      color: #2e7d32;
+    }
+
+    .locate-button {
+      background: #43a047;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .locate-button:hover {
+      background: #2e7d32;
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <h2>🌱 Smart Recycling</h2>
+    <ul>
+      <li><a href="dashboard.html">Beranda</a></li>
+      <li><a href="activity.html">Lacak Aktivitas</a></li>
+      <li><a href="rewards.html">Poin Reward</a></li>
+      <li><a href="profile.html">Profil</a></li>
+      <li><a href="news.html">Berita</a></li>
+      <li><a href="map.html" class="active">Lokasi Bank Sampah</a></li>
+      <li><a href="contact.html">Kontak</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </aside>
+
+  <main class="dashboard-content">
+    <h1>Peta Lokasi Bank Sampah di Banyumas</h1>
+    <div id="map"></div>
+  </main>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Geocoder (Search Bar) JS -->
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <script>
+    // Titik tengah Banyumas
+    const centerBanyumas = [-7.4356, 109.2511];
+    const map = L.map('map').setView(centerBanyumas, 13);
+
+    // Tambahkan tile peta (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Icon marker hijau untuk bank sampah
+    const greenIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    // Daftar lokasi bank sampah
+    const locations = [
+      { name: "Bank Sampah Kalibakal", position: [-7.4345, 109.2478], address: "Kalibakal, Berkoh, Purwokerto Selatan" },
+      { name: "Bank Sampah Bojong", position: [-7.4402, 109.2544], address: "Bojong, Tanjung, Purwokerto Selatan" },
+      { name: "Bank Sampah Sokayasa", position: [-7.4299, 109.2607], address: "Sokayasa, Purwokerto Timur" },
+      { name: "Bank Sampah Tambak Batu", position: [-7.4420, 109.2560], address: "Jl. Tambak Batu, Bojong" },
+      { name: "Bank Sampah Sudimara", position: [-7.4443, 109.2490], address: "Sudimara, Karangklesem" },
+      { name: "Bank Sampah Grendeng", position: [-7.4090, 109.2409], address: "Jl. PDU, Grendeng" },
+      { name: "Bank Sampah Bahrun", position: [-7.4368, 109.2501], address: "Jl. HM Bahrun No.373, Berkoh" },
+      { name: "Bank Sampah Pereng", position: [-7.4236, 109.2660], address: "Pereng, Sokanegara" },
+      { name: "Bank Sampah Bobosan", position: [-7.4137, 109.2363], address: "Jl. Gn. Wilis No.24, Bobosan" },
+    ];
+
+    // Tambahkan marker untuk setiap bank sampah
+    locations.forEach(loc => {
+      L.marker(loc.position, { icon: greenIcon })
+        .addTo(map)
+        .bindPopup(`<strong>${loc.name}</strong><br>${loc.address}`);
+    });
+
+    // Fitur pencarian lokasi
+    L.Control.geocoder({
+      defaultMarkGeocode: false,
+      placeholder: '🔍 Cari lokasi sekitar Banyumas...'
+    }).on('markgeocode', e => {
+      const latlng = e.geocode.center;
+      L.marker(latlng, { icon: greenIcon }).addTo(map)
+        .bindPopup(e.geocode.name).openPopup();
+      map.setView(latlng, 15);
+    }).addTo(map);
+
+    // Tombol "Lokasi Saya"
+    const locateBtn = L.control({ position: 'topleft' });
+    locateBtn.onAdd = function () {
+      const btn = L.DomUtil.create('button', 'locate-button');
+      btn.innerHTML = '📍 Lokasi Saya';
+      btn.onclick = function () {
+        map.locate({ setView: true, maxZoom: 16 });
+      };
+      return btn;
+    };
+    locateBtn.addTo(map);
+
+    let userMarker, routeLine;
+
+    // Ketika lokasi ditemukan
+    map.on('locationfound', function (e) {
+      const userLoc = e.latlng;
+      const radius = e.accuracy / 2;
+
+      if (userMarker) map.removeLayer(userMarker);
+      if (routeLine) map.removeLayer(routeLine);
+
+      userMarker = L.marker(userLoc)
+        .addTo(map)
+        .bindPopup(`📍 Kamu di sini (akurasi ±${radius.toFixed(0)} m)`)
+        .openPopup();
+
+      L.circle(userLoc, {
+        color: '#2e7d32',
+        fillColor: '#a5d6a7',
+        fillOpacity: 0.3,
+        radius
+      }).addTo(map);
+
+      // Cari bank sampah terdekat
+      const nearest = findNearest(userLoc, locations);
+      const distance = haversine(userLoc.lat, userLoc.lng, nearest.position[0], nearest.position[1]);
+      const walkSpeed = 5; // km/jam
+      const timeMinutes = Math.round((distance / walkSpeed) * 60);
+
+      // Gambar garis rute (polyline)
+      routeLine = L.polyline([userLoc, nearest.position], {
+        color: 'blue',
+        weight: 4,
+        opacity: 0.7,
+        dashArray: '5, 10'
+      }).addTo(map);
+
+      // Tampilkan popup bank sampah terdekat + jarak + estimasi waktu
+      L.popup()
+        .setLatLng(nearest.position)
+        .setContent(`
+          <strong>Bank Sampah Terdekat:</strong><br>
+          ${nearest.name}<br>${nearest.address}<br><br>
+          🚶‍♂️ <strong>Jarak:</strong> ${distance.toFixed(2)} km<br>
+          ⏱️ <strong>Perkiraan waktu:</strong> sekitar ${timeMinutes} menit jalan kaki
+        `)
+        .openOn(map);
+    });
+
+    map.on('locationerror', function () {
+      alert("⚠️ Tidak dapat menemukan lokasi Anda. Pastikan GPS aktif dan browser mengizinkan lokasi.");
+    });
+
+    // Fungsi cari lokasi terdekat (Haversine)
+    function findNearest(userLoc, locations) {
+      let nearest = null;
+      let minDist = Infinity;
+
+      locations.forEach(loc => {
+        const d = haversine(userLoc.lat, userLoc.lng, loc.position[0], loc.position[1]);
+        if (d < minDist) {
+          minDist = d;
+          nearest = loc;
+        }
+      });
+
+      return nearest;
+    }
+
+    // Rumus jarak Haversine (km)
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+  </script>
+</body>
+</html>

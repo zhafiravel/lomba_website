@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poin Reward | Smart Recycling</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>🌱 Smart Recycling</h2>
+    <ul>
+      <li><a href="dashboard.html">Beranda</a></li>
+      <li><a href="activity.html">Lacak Aktivitas</a></li>
+      <li><a href="rewards.html" class="active">Poin Reward</a></li>
+      <li><a href="profile.html">Profil</a></li>
+      <li><a href="news.html">Berita</a></li>
+      <li><a href="map.html">Lokasi Bank Sampah</a></li>
+      <li><a href="contact.html">Kontak</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </aside>
+
+  <main class="dashboard-content">
+    <h1>Poin Reward 💚</h1>
+    <h2>Total Poin Kamu: <span class="points">250</span> 🌟</h2>
+
+    <div class="reward-grid">
+      <div class="reward-card" data-name="Voucher Belanja" data-cost="100">
+        <h3>Voucher Belanja</h3>
+        <p>100 poin</p>
+        <button class="tukar-btn">Tukar</button>
+      </div>
+      <div class="reward-card" data-name="Tumbler Ramah Lingkungan" data-cost="200">
+        <h3>Tumbler Ramah Lingkungan</h3>
+        <p>200 poin</p>
+        <button class="tukar-btn">Tukar</button>
+      </div>
+      <div class="reward-card" data-name="Tanaman Mini" data-cost="150">
+        <h3>Tanaman Mini</h3>
+        <p>150 poin</p>
+        <button class="tukar-btn">Tukar</button>
+      </div>
+    </div>
+
+    <section class="riwayat-section">
+      <h2>🎁 Riwayat Penukaran</h2>
+      <ul class="riwayat-list"></ul>
+    </section>
+  </main>
+
+  <script>
+    // Ambil elemen penting
+    const pointsDisplay = document.querySelector(".points");
+    const buttons = document.querySelectorAll(".tukar-btn");
+    const riwayatList = document.querySelector(".riwayat-list");
+
+    // Ambil data poin & riwayat dari localStorage (jika ada)
+    let totalPoints = localStorage.getItem("userPoints") ? parseInt(localStorage.getItem("userPoints")) : 250;
+    let riwayat = JSON.parse(localStorage.getItem("riwayatPenukaran")) || [];
+
+    // Update tampilan awal
+    pointsDisplay.textContent = totalPoints;
+    tampilkanRiwayat();
+
+    // Fungsi tampilkan riwayat
+    function tampilkanRiwayat() {
+      riwayatList.innerHTML = "";
+      if (riwayat.length === 0) {
+        riwayatList.innerHTML = "<li>Belum ada penukaran reward.</li>";
+        return;
+      }
+      riwayat.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.namaReward} - ${item.tanggal}`;
+        riwayatList.appendChild(li);
+      });
+    }
+
+    // Fungsi penukaran poin
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const card = btn.parentElement;
+        const namaReward = card.getAttribute("data-name");
+        const cost = parseInt(card.getAttribute("data-cost"));
+
+        if (totalPoints < cost) {
+          alert("❌ Poin kamu tidak cukup untuk menukar reward ini!");
+          return;
+        }
+
+        // Konfirmasi
+        if (confirm(`Apakah kamu yakin ingin menukar ${namaReward} seharga ${cost} poin?`)) {
+          totalPoints -= cost;
+          pointsDisplay.textContent = totalPoints;
+          localStorage.setItem("userPoints", totalPoints);
+
+          // Simpan ke riwayat
+          const tanggal = new Date().toLocaleString("id-ID");
+          riwayat.push({ namaReward, tanggal });
+          localStorage.setItem("riwayatPenukaran", JSON.stringify(riwayat));
+
+          tampilkanRiwayat();
+          alert(`✅ Berhasil menukar ${namaReward}!`);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
